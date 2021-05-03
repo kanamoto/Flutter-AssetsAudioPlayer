@@ -514,17 +514,6 @@ public class Player : NSObject, AVAudioPlayerDelegate {
             print("displayNotification " + displayNotification.description)
             print("url: " + url.absoluteString)
             
-            /* set session category and mode with options */
-            if #available(iOS 10.0, *) {
-                //try AVAudioSession.sharedInstance().setCategory(category, mode: mode, options: [.mixWithOthers])
-                try AVAudioSession.sharedInstance().setCategory(category, mode: .default, options: [])
-                try AVAudioSession.sharedInstance().setActive(true)
-            } else {
-                
-                try AVAudioSession.sharedInstance().setCategory(category)
-                try AVAudioSession.sharedInstance().setActive(true)
-                
-            }
             #endif
             
             var item : SlowMoPlayerItem
@@ -590,6 +579,29 @@ public class Player : NSObject, AVAudioPlayerDelegate {
                         #endif
                     }
                     
+                    // for respectSilentMopde from here
+                    #if os(iOS)
+                    do{
+                        if #available(iOS 10.0, *) {
+                            try AVAudioSession.sharedInstance().setCategory(category, mode: .default, options: [])
+                            try AVAudioSession.sharedInstance().setActive(true)
+                        } else {
+                            try AVAudioSession.sharedInstance().setCategory(category)
+                            try AVAudioSession.sharedInstance().setActive(true)
+                        }
+                    } catch let errorSetCategory {
+                        result(FlutterError(
+                            code: "PLAY_ERROR",
+                            message: "Cannot play "+assetPath,
+                            details: errorSetCategory.localizedDescription)
+                        )
+                        self?.log(errorSetCategory.localizedDescription)
+                        print(errorSetCategory.localizedDescription)
+                        return;
+                    }
+                    #endif
+                    // to here
+
                     if(autoStart == true){
                         self?.play()
                     }
