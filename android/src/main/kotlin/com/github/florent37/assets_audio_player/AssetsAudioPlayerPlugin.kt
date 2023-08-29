@@ -76,7 +76,7 @@ class AssetsAudioPlayerPlugin : FlutterPlugin, PluginRegistry.NewIntentListener,
         return false
     }
 
-    override fun onNewIntent(intent: Intent?): Boolean {
+    override fun onNewIntent(intent: Intent): Boolean {
         if (intent == null)
             return false
 
